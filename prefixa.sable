@@ -1,0 +1,53 @@
+Package prefixa;
+
+Helpers
+ digito = ['0'..'9'];
+ espaco = ' ';
+ 
+ letra = [['a'..'z'] + ['A'..'Z']];
+ hexad = pensando
+
+ esq_boxcoment = '{-';
+ dir_boxcoment = '-}';  
+ 
+ Tokens
+ comeca_bloc = 'start';
+ termina_bloc = 'end';
+ ponto_virgula = ';';
+ parent_esq = '(';
+ parent_dir = ')';
+ 
+
+ 
+ colche_esq = '[';
+ colche_dir = ']'; 
+ atribuicao='<<'
+ tipo_int = 'integer';
+ tipo_real = 'real';
+ tipo_bool = 'boolean';
+ virgula = ',';
+ dois_pontos = ':';
+ negacao= 'not';
+ e = 'and';
+ ou = 'or';
+ verdade = 'true';
+ falso = 'false';
+ igualdade = '=';
+ menor_que = '<';
+ maior_que = '>';
+ soma = '+';
+ subt = '-';
+ mult = '*';
+ div = '/';
+ mod = '%';
+ se = 'if';
+ senao = 'else';
+ enquanto='while';
+ para_cada='for each';
+ mostrar='show';
+ capturar='capture';
+ retorno='send back';
+ underscore='_';
+ identificador = letra(letra|underscore)*;
+
+ 
