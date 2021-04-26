@@ -1,0 +1,54 @@
+Package prefixa;
+
+Helpers
+ digito = ['0'..'9'];
+ espaco = ' ';
+ binr = [ ['0b' .. '1b'] | ['0B' .. '1B'] ]; 
+ hexad = [ ['0a' .. '9f'] | ['0A' .. '9F'] ]; 
+ letra = [['a'..'z'] + ['A'..'Z']];
+ esq_boxcoment = '{-';
+ dir_boxcoment = '-}';
+
+Tokens
+ atribuicao='<<'
+ capturar='capture';
+ colche_dir = ']'; 
+ colche_esq = '[';
+ comeca_bloc = 'start';
+ dir_boxcoment = '-}';
+ div = '/';
+ dois_pontos = ':';
+ e = 'and';
+ enquanto='while';
+ falso = 'false';
+ identificador = letra(letra|underscore)*;
+ igualdade = '=';
+ linecoment = '#-'; 
+ maior_que = '>';
+ maior_ou_igual = '>=';
+ menor_que = '<';
+ menor_ou_igual = '<=';
+ mod = '%';
+ mostrar='show';
+ mult = '*';
+ negacao= 'not';
+ ou = 'or';
+ para_cada='for each';
+ parent_dir = ')';
+ parent_esq = '(';
+ ponto_virgula = ';';
+ retorno='send back';
+ se = 'if';
+ senao = 'else';
+ soma = '+';
+ subt = '-';
+ termina_bloc = 'end';
+ tipo_bool = 'boolean';
+ tipo_char = 'char';
+ tipo_int = 'integer';
+ tipo_vetor = 'vector';
+ underscore='_';
+ verdade = 'true';
+ virgula = ',';
+
+ 
