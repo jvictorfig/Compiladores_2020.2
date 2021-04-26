@@ -2,16 +2,17 @@ Package prefixa;
 
 Helpers
  digito = ['0'..'9'];
- espaco = ' ';
- binr = [ ['0b' .. '1b'] | ['0B' .. '1B'] ]; 
- hexad = [ ['0a' .. '9f'] | ['0A' .. '9F'] ]; 
+ hexad = ['0'..'9'] |['A'..'F'] | ['a'..'f'];
  letra = [['a'..'z'] + ['A'..'Z']];
- esq_boxcoment = '{-';
- dir_boxcoment = '-}';
-
+ esq_boxcoment = '{';
+ dir_boxcoment = '}';
+ underscore='_';
+ espaco = ' ';
 Tokens
- atribuicao='<<'
- capturar='capture';
+ 
+ linecoment = '#-'; 
+ atribuicao = '<<';
+ capturar = 'capture';
  colche_dir = ']'; 
  colche_esq = '[';
  comeca_bloc = 'start';
@@ -19,11 +20,11 @@ Tokens
  div = '/';
  dois_pontos = ':';
  e = 'and';
- enquanto='while';
+ enquanto = 'while';
  falso = 'false';
+
  identificador = letra(letra|underscore)*;
  igualdade = '=';
- linecoment = '#-'; 
  maior_que = '>';
  maior_ou_igual = '>=';
  menor_que = '<';
@@ -47,8 +48,10 @@ Tokens
  tipo_char = 'char';
  tipo_int = 'integer';
  tipo_vetor = 'vector';
- underscore='_';
+ vazio=(espaco)+;
  verdade = 'true';
  virgula = ',';
-
+ 
+ Ignored Tokens
+ vazio;
  
