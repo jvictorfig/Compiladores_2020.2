@@ -3,9 +3,9 @@ Package prefixa;
 Helpers
  tudo = [0..0xffff];
  digito = ['0'..'9'];
- hexad = ['0'..'9'] |['A'..'F'] | ['a'..'f'];
+ hexad = '0x' | '0X' + [['0'..'9'] |['A'..'F'] | ['a'..'f']]+;
  decimal=digito+;
- binr =  '0b' | '0B'+(0|1)+;
+ binr =  '0b' | '0B' + (0|1)+;
  letra = [['a'..'z'] + ['A'..'Z']];
  cr=13;
  newline=10;
