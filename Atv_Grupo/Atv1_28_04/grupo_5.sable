@@ -1,16 +1,23 @@
 Package prefixa;
 
 Helpers
+ tudo = [0..0xffff];
  digito = ['0'..'9'];
  hexad = ['0'..'9'] |['A'..'F'] | ['a'..'f'];
  letra = [['a'..'z'] + ['A'..'Z']];
- esq_boxcoment = '{';
- dir_boxcoment = '}';
+ cr=13;
+ newline=10;
+ tab=9;
+ pontoevirg=59;
+ tudosemnl= [tudo- [newline+cr]];
+ comecoesqcoment = '{';
+ terminadircoment = '}';
  underscore='_';
  espaco = ' ';
+ sustenido='#';
 Tokens
  
- linecoment = '#-'; 
+ 
  atribuicao = '<<';
  capturar = 'capture';
  colche_dir = ']'; 
@@ -37,7 +44,6 @@ Tokens
  para_cada='for each';
  parent_dir = ')';
  parent_esq = '(';
- ponto_virgula = ';';
  retorno='send back';
  se = 'if';
  senao = 'else';
@@ -48,10 +54,13 @@ Tokens
  tipo_char = 'char';
  tipo_int = 'integer';
  tipo_vetor = 'vector';
- vazio=(espaco)+;
+ vazio= (espaco | tab| newline|cr)+;
  verdade = 'true';
  virgula = ',';
+ comentariolinha=pontoevirg(tudosemnl)*(newline+cr)+;
+ comentariodebloco=comecoesqcoment(tudo)*terminadircoment;
+ 
  
  Ignored Tokens
- vazio;
+ vazio,comentariolinha,comentariodebloco;
  
