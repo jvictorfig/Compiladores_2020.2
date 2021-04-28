@@ -4,6 +4,7 @@ Helpers
  tudo = [0..0xffff];
  digito = ['0'..'9'];
  hexad = ['0'..'9'] |['A'..'F'] | ['a'..'f'];
+ binr = ['0'..'1'] | '0b' | '0B';
  letra = [['a'..'z'] + ['A'..'Z']];
  cr=13;
  newline=10;
@@ -15,9 +16,8 @@ Helpers
  underscore='_';
  espaco = ' ';
  sustenido='#';
+ 
 Tokens
- 
- 
  atribuicao = '<<';
  capturar = 'capture';
  colche_dir = ']'; 
@@ -60,7 +60,6 @@ Tokens
  comentariolinha=pontoevirg(tudosemnl)*(newline+cr)+;
  comentariodebloco=comecoesqcoment(tudo)*terminadircoment;
  
- 
- Ignored Tokens
+Ignored Tokens
  vazio,comentariolinha,comentariodebloco;
  
