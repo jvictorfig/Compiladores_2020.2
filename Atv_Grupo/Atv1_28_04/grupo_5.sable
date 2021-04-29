@@ -3,7 +3,7 @@ Package prefixa;
 Helpers
  tudo = [0..0xffff];
  digito = ['0'..'9'];
- hexad = '0x' | '0X' + [['0'..'9'] |['A'..'F'] | ['a'..'f']]+;
+ hexad = '0x' | '0X' + ['0'..'9'] |['A'..'F'] | ['a'..'f']+;
  decimal=digito+;
  binr =  '0b' | '0B' + (0|1)+;
  letra = [['a'..'z'] + ['A'..'Z']];
@@ -59,7 +59,7 @@ Tokens
  vazio= (espaco | tab| newline|cr)+;
  verdade = 'true';
  virgula = ',';
- comentariolinha=pontoevirg(tudosemnl)*(newline+cr)+;
+ comentariolinha=sustenido(tudosemnl)*(newline+cr)+;
  comentariodebloco=comecoesqcoment(tudo)*terminadircoment;
  numero_inteiro=decimal|hexad|binr;
  
