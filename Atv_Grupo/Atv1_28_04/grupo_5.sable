@@ -32,7 +32,7 @@ Tokens
  enquanto = 'while';
  falso = 'false';
 
- identificador = letra(letra|underscore)*;
+ 
  igualdade = '=';
  maior_que = '>';
  maior_ou_igual = '>=';
@@ -62,7 +62,7 @@ Tokens
  comentariolinha=sustenido(tudosemnl)*(newline+cr)+;
  comentariodebloco=comecoesqcoment(tudo)*terminadircoment;
  numero_inteiro=decimal|hexad|binr;
- 
+ identificador = letra(letra|underscore)*;
  
  Ignored Tokens
  vazio,comentariolinha,comentariodebloco;
