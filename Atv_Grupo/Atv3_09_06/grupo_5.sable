@@ -1,0 +1,206 @@
+Package prefixa;
+
+Helpers
+ tudo = [0..0xffff];
+ digito = ['0'..'9'];
+ hexad = '0x' | '0X' + ['0'..'9'] |['A'..'F'] | ['a'..'f']+;
+ decimal=digito+;
+ binr =  '0b' | '0B' + (0|1)+;
+ letra = [['a'..'z'] + ['A'..'Z']];
+ cr=13;
+ newline=10;
+ tab=9;
+ pontoevirg=59;
+ tudosemnl= [tudo- [newline+cr]];
+ comecoesqcoment = '{';
+ terminadircoment = '}';
+ underscore='_';
+ espaco = ' ';
+ sustenido='#';
+Tokens
+ 
+ pontovirgula=';';
+ atribuicao = '<<';
+ capturar = 'capture';
+ colche_dir = ']'; 
+ colche_esq = '[';
+ comeca_bloc = 'start';
+ dir_boxcoment = '-}';
+ div = '/';
+ dois_pontos = ':';
+ e = 'and';
+ enquanto = 'while';
+ falso = 'false';
+ barravert='|';
+ aspas='"';
+ igualdade = '=';
+ maior_que = '>';
+ maior_ou_igual = '>=';
+ menor_que = '<';
+ menor_ou_igual = '<=';
+ mod = '%';
+ mostrar='show';
+ mult = '*';
+ negacao= 'not';
+ ou = 'or';
+ para_cada='for each';
+ parent_dir = ')';
+ parent_esq = '(';
+ retorno='send back';
+ se = 'if';
+ senao = 'else';
+ soma = '+';
+ subt = '-';
+ termina_bloc = 'end';
+ tipo_bool = 'boolean';
+ tipo_char = 'char';
+ tipo_int = 'integer';
+ tipo_vetor = 'vector';
+ vazio= (espaco | tab| newline|cr)+;
+ verdade = 'true';
+ virgula = ',';
+ comentariolinha=sustenido(tudosemnl)*(newline+cr)+;
+ comentariodebloco=comecoesqcoment(tudo)*terminadircoment;
+ numero_inteiro=decimal|hexad|binr;
+ identificador = letra(letra|underscore)*;
+ caracteres=letra;
+ string=letra+;
+nenhum = 'none';
+ Ignored Tokens
+ vazio,comentariolinha,comentariodebloco;
+ 
+ 
+ Productions
+ 
+ programa=
+ {programa} dec_variavel* decfuncao*;
+
+ 
+ dec_variavel=
+ {declararvar} tipo lista_nomes pontovirgula;
+ 
+ 
+ lista_nomes=
+ {listanomes}tipobase identificador addnome* ;
+ 
+ addnome =
+ {adicionarnome} virgula identificador;
+ 
+ 
+ tipo=
+ {irpratipo}tipobase
+| {vectors} tipo_vetor tipobase  colche_esq tipo_int colche_dir;
+ 
+ 
+ 
+tipobase=
+ {inteiro} tipo_int
+ |{caractere} tipo_char
+ |{booleaano} tipo_bool;
+ 
+ decfuncao=
+ {declararfuncao} tipo_r identificador parent_esq parametros? parent_dir bloco;
+ 
+ parametros=
+ {parametro} parametro addparametros* ;
+ 
+ addparametros=
+ {addparametro} barravert parametro;
+ 
+ parametro=
+ {declararparam} tipo identificador;
+ 
+ tipo_r=
+{tipo_retorno} tipo | nenhum;
+
+expr =
+ {soma} soma expr termo
+ |{subt} subt expr termo
+ | {igualdade} igualdade expr termo
+ |{maior_que} maior_que  expr termo
+ |{maior_ou_igual} maior_ou_igual expr termo
+ |{menor_que} menor_que expr termo
+ |{menor_ou_igual} menor_ou_igual expr termo
+ |{not} negacao expr
+ |{and} e expr termo
+ |{or} ou expr termo;
+ 
+ termo =
+ {mult} mult termo fator
+ | {div} div termo fator
+ | {mod} mod termo fator
+ | fator;
+ 
+ fator = 
+{fatores} parent_esq expr parent_dir
+|{num} numero
+|{boolean_func} booleano
+|{caractere}caracteres
+|{string} string;
+
+
+
+
+
+numero=
+{num} numero_inteiro;
+
+booleano=
+{true} verdade
+|{false} falso;
+
+
+atrib=
+{atrib} var atribuicao expr;
+
+bloco=
+{block}comeca_bloc dec_variavel* comando* termina_bloc;
+
+comando=
+{condse} se parent_esq expr parent_dir [comando_um]:comando senao [comando_dois]:comando
+|{while} enquanto parent_esq expr parent_dir comando
+|{para_cada} para_cada parent_esq tipo [id_um]:identificador dois_pontos [id_dois]:identificador parent_dir comando
+|{atribc} atrib
+|{sendback} retorno pontovirgula
+|{sendbackexp}retorno colche_esq expr colche_dir
+|{refbloco} bloco
+|{chamada_fim} chamada pontovirgula;
+
+
+
+var=
+{variavel} identificador
+|{variavel2} identificador colche_esq expr colche_dir;
+
+
+
+chamada=
+{call} identificador parent_esq listaexp? parent_dir;
+
+listaexp=
+ {addexpr}expr addexpr*;
+
+
+show =
+{mostrar} parent_esq expr parent_dir
+|{mostrari} parent_esq identificador parent_dir
+|{mostrarv} parent_esq var parent_dir
+|{mostrart} parent_esq [esq]:aspas caracteres* [dir]:aspas parent_dir;
+
+
+addexpr=
+{fechobarravertexpr} barravert expr;
+
+capture=
+{capturar} capturar parent_esq var addvar* parent_dir;
+
+addvar=
+{addcaptura} barravert var;
+
+
+
+
+
+ 
+ 
+ 
