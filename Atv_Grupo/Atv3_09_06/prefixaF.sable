@@ -1,0 +1,181 @@
+Package prefixa;
+
+Helpers
+ binr =  '0b' | '0B'  (0|1)+;
+ comecoesqcoment = '{';
+ cr=13;
+ digito = ['0'..'9'];
+ decimal = digito+;
+ espaco = ' ';
+ hexad = '0x' | '0X'  ['0'..'9'] |['A'..'F'] | ['a'..'f']+;
+ letra = [['a'..'z'] + ['A'..'Z']];
+ newline = 10;
+ pontoevirg = 59;
+ sustenido = '#';
+ tab = 9;
+ terminadircoment = '}';
+ tudo = [0..0xffff];
+ tudosemnl = [tudo- [newline+cr]];
+ underscore ='_';
+
+Tokens
+ aspas = '"';
+ atribuicao = '<<';
+ barravert = '|';
+ capturar = 'capture';
+ caracteres = letra;
+ colche_dir = ']'; 
+ colche_esq = '[';
+ comeca_bloc = 'start';
+ comentariodebloco = comecoesqcoment(tudo)*terminadircoment;
+ comentariolinha = sustenido(tudosemnl)*(newline+cr)+;
+ dir_boxcoment = '-}';
+ div = '/';
+ dois_pontos = ':';
+ e = 'and';
+ enquanto = 'while';
+ falso = 'false';
+ identificador = letra(letra|underscore)*;
+ igualdade = '=';
+ maior_ou_igual = '>=';
+ maior_que = '>';
+ menor_ou_igual = '<=';
+ menor_que = '<';
+ mod = '%';
+ mostrar ='show';
+ mult = '*';
+ negacao = 'not';
+ numero_inteiro = decimal|hexad|binr;
+ ou = 'or';
+ para_cada ='for each';
+ parent_dir = ')';
+ parent_esq = '(';
+ retorno ='send back';
+ se = 'if';
+ senao = 'else';
+ soma = '+';
+ string = letra+;
+ subt = '-';
+ termina_bloc = 'end';
+ tipo_bool = 'boolean';
+ tipo_char = 'char';
+ tipo_int = 'integer';
+ tipo_vetor = 'vector';
+ vazio = (espaco | tab| newline|cr)+;
+ verdade = 'true';
+ virgula = ',';
+ nenhum = 'none';
+ pontovirgula = ';';
+
+Ignored Tokens
+ vazio,comentariolinha,comentariodebloco;
+ 
+ 
+Productions
+ addnome = 
+ {adicionarnome} virgula identificador;
+
+ addparametros = 
+ {addparametro} barravert parametro;
+ 
+ dec_variavel= 
+ {declararvar} tipo lista_nomes pontovirgula;
+ 
+ decfuncao= 
+ {declararfuncao} tipo_r identificador parent_esq parametros? parent_dir bloco;
+ 
+ fator = 
+ {fatores} parent_esq expr parent_dir 
+ | {num} numero 
+ | {boolean_func} booleano 
+ | {caractere}caracteres
+ | {string} string;
+ 
+ lista_nomes = 
+ {listanomes}tipobase identificador addnome* ;
+ 
+ parametro = 
+ {declararparam} tipo identificador;
+ 
+ parametros = 
+ {parametro} parametro addparametros* ;
+ 
+ programa= 
+ {programa} dec_variavel* decfuncao*;
+ 
+ termo = 
+ {mult} mult termo fator 
+ | {div} div termo fator 
+ | {mod} mod termo fator 
+ | fator;
+ 
+ tipo_r = 
+ {tipo_retorno} tipo 
+ | nenhum;
+ 
+ tipo = 
+ {irpratipo}tipobase 
+ | {vectors} tipo_vetor tipobase colche_esq tipo_int colche_dir;
+ 
+ addexpr = 
+ {fechobarravertexpr} barravert expr;
+ 
+ addvar = 
+ {addcaptura} barravert var;
+ 
+ atrib = 
+ {atrib} var atribuicao expr;
+ 
+ bloco = 
+ {block}comeca_bloc dec_variavel* comando* termina_bloc;
+ 
+ booleano = 
+ {true} verdade 
+ | {false} falso;
+ 
+ capture = 
+ {capturar} capturar parent_esq var addvar* parent_dir;
+ 
+ chamada =  
+ {call} identificador parent_esq listaexp? parent_dir;
+ 
+ comando = 
+ {condse} se parent_esq expr parent_dir [comando_um]:comando senao [comando_dois]:comando 
+ | {while} enquanto parent_esq expr parent_dir comando 
+ | {para_cada} para_cada parent_esq tipo [id_um]:identificador dois_pontos [id_dois]:identificador parent_dir comando 
+ | {atribc} atrib 
+ | {sendback} retorno pontovirgula 
+ | {sendbackexp}retorno colche_esq expr colche_dir 
+ | {refbloco} bloco 
+ | {chamada_fim} chamada pontovirgula;
+ 
+ expr = 
+ {soma} soma expr termo
+ | {subt} subt expr termo
+ | {igualdade} igualdade expr termo
+ | {maior_que} maior_que  expr termo
+ | {maior_ou_igual} maior_ou_igual expr termo
+ | {menor_que} menor_que expr termo
+ | {menor_ou_igual} menor_ou_igual expr termo
+ | {not} negacao expr
+ | {and} e expr termo
+ | {or} ou expr termo;
+ 
+ listaexp = {addexpr }expr addexpr*;
+ 
+ numero = {num} numero_inteiro;
+ 
+ show = 
+ {mostrar} parent_esq expr parent_dir 
+ | {mostrari} parent_esq identificador parent_dir 
+ | {mostrarv} parent_esq var parent_dir
+ | {mostrart} parent_esq [esq]:aspas caracteres* [dir]:aspas parent_dir;
+ 
+ tipobase = 
+ {inteiro} tipo_int 
+ |{caractere} tipo_char 
+ |{booleaano} tipo_bool;
+ 
+ var = 
+ {variavel} identificador 
+ |{variavel2} identificador colche_esq expr colche_dir;
