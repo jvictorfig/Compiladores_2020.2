@@ -1,0 +1,184 @@
+Package prefixa;
+
+Helpers
+ binr =  '0b' | '0B'  (0|1)+;
+ comecoesqcoment = '{';
+ cr=13;
+ digito = ['0'..'9'];
+ decimal = digito+;
+ espaco = ' ';
+ hexad = '0x' | '0X'  ['0'..'9'] |['A'..'F'] | ['a'..'f']+;
+ letra = [['a'..'z'] + ['A'..'Z']];
+ newline = 10;
+ pontoevirg = 59;
+ sustenido = '#';
+ tab = 9;
+ terminadircoment = '}';
+ tudo = [0..0xffff];
+ tudosemnl = [tudo- [newline+cr]];
+ underscore ='_';
+
+Tokens
+ tipo_bool = 'boolean';
+ tipo_char = 'char';
+ tipo_int = 'integer';
+ tipo_vetor = 'vector';
+ aspas = '"';
+ nenhum = 'none';
+ barravert = '|';
+ capturar = 'capture';
+ caracteres = letra;
+ colche_dir = ']'; 
+ colche_esq = '[';
+ comeca_bloc = 'start';
+ termina_bloc = 'end';
+ se = 'if';
+ senao = 'else';
+ comentariodebloco = comecoesqcoment(tudo)*terminadircoment;
+ comentariolinha = sustenido(tudosemnl)*(newline+cr)+;
+ dir_boxcoment = '-}';
+ div = '/';
+ dois_pontos = ':';
+ e = 'and';
+ enquanto = 'while';
+ falso = 'false';
+ identificador = letra(letra|underscore)*;
+ igualdade = '=';
+ maior_ou_igual = '>=';
+ maior_que = '>';
+ menor_ou_igual = '<=';
+ menor_que = '<';
+ mod = '%';
+ mostrar ='show';
+ mult = '*';
+ negacao = 'not';
+ numero_inteiro = decimal|hexad|binr;
+ ou = 'or';
+ para_cada ='for each';
+ parent_dir = ')';
+ parent_esq = '(';
+ retorno ='send back';
+ 
+ soma = '+';
+ string = letra+;
+ subt = '-';
+
+ atribuicao = '<<';
+ vazio = (espaco | tab| newline|cr)+;
+ verdade = 'true';
+ virgula = ',';
+
+ pontovirgula = ';';
+ 
+Ignored Tokens
+ vazio, 
+ comentariolinha,
+ comentariodebloco;
+  
+Productions
+
+ programa = 
+ {decvariable} dec_variavel
+ |{declarar} decfuncao;
+
+ 
+ bloco = 
+ {block}comeca_bloc dec_variavel* comando* termina_bloc;
+ 
+ dec_variavel= 
+ {declararvar} tipo lista_nomes pontovirgula;
+ 
+ comando = 
+ {condse} se parent_esq expr parent_dir [comando_um]:comando senao [comando_dois]:comando 
+ | {while} enquanto parent_esq expr parent_dir comando 
+ | {para_cada} para_cada parent_esq tipo [id_um]:identificador dois_pontos [id_dois]:identificador parent_dir comando 
+ | {sendback} retorno pontovirgula 
+ | {sendbackexp}retorno colche_esq expr colche_dir 
+ | {atribuindo} atrib 
+ | {refbloco} bloco 
+ |{refcall} chamada;
+ 
+  decfuncao= 
+ {declararfuncao} tipo_r identificador parent_esq parametros? parent_dir bloco;
+  lista_nomes = 
+ {listanomes} identificador addnome* ;
+  parametros = 
+ {parametro} parametro addparametros* ;
+ 
+ parametro = 
+ {declararparam} tipo identificador;
+ 
+  addparametros = 
+ {addparametro} barravert parametro;
+ 
+  tipo_r = 
+ {tipo_retorno} tipo 
+ | nenhum;
+ 
+  addnome = 
+ {adicionarnome} virgula identificador;
+ 
+tipo = 
+ {irpratipo}tipobase 
+ | {vectors} tipo_vetor tipobase colche_esq tipo_int colche_dir;
+ 
+ 
+ tipobase = 
+ {inteiro} tipo_int 
+ |{caractere} tipo_char 
+ |{booleaano} tipo_bool;
+ 
+
+ atrib = 
+ {atrib} var atribuicao expr;
+ 
+ listaexp = 
+ {addexpr }expr addexpr*;
+ 
+ addexpr = 
+ {fechobarravertexpr} barravert expr;
+ 
+ chamada =  
+ {call} identificador parent_esq listaexp? parent_dir; 
+ expr =
+ {var} var
+ |{expr} termo 
+ |{soma} soma expr termo
+ | {subt} subt expr termo
+ | {igualdade} igualdade expr termo
+ | {maior_que} maior_que  expr termo
+ | {maior_ou_igual} maior_ou_igual expr termo
+ | {menor_que} menor_que expr termo
+ | {menor_ou_igual} menor_ou_igual expr termo
+ | {not} negacao expr
+ | {and} e expr termo
+ | {or} ou expr termo;
+ 
+ var = 
+ {variavel} identificador 
+ |{variavel2} identificador colche_esq expr colche_dir;
+ 	
+ termo = 
+ {mult} mult termo fator 
+ | {div} div termo fator 
+ | {mod} mod termo fator 
+ | fator;
+ 
+ fator = 
+ {fatores} parent_esq expr parent_dir 
+ | {num} numero 
+ | {boolean_func} booleano 
+ | {caractere}caracteres
+ | {string} string;
+ 
+ numero = 
+ {num} numero_inteiro;
+ 
+ booleano = 
+ {true} verdade 
+ | {false} falso;
+ 
+ 
+ 
+
+ 
