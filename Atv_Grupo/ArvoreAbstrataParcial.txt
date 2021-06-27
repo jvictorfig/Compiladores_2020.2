@@ -1,0 +1,212 @@
+programa {-> programa} = 
+ 
+	{decvariable} dec_variavel {-> decvariable.programa}
+ 
+	|{declarar} decfuncao {-> decfuncao.programa}
+ 
+
+dec_variavel {-> dec_variavel} =
+ 
+	{declararvar} [tleft]:tipo [mid]:lista_nomes [right]:pontovirgula {New dec_variavel.a_declararvar(left.tipo, mid.lista_nomes, right.pontovirgula)};
+ 
+ 
+comando {-> comando} = 
+	{atribuindo} atrib {-> atrib.comando} //pensando
+	|{condse} se parent_esq [left]:expr parent_dir [mid]:comando senao [dir]:comando {-> New comando.a_condse(left.expr,mid.comando,right.comando)}
+	|{para_cada} para_cada parent_esq tipo [id_um]:identificador dois_pontos [id_dois]:identificador parent_dir [dir]:comando{->New //pensando
+	|{sendback} retorno pontovirgula {New comando.a_sendback(retorno, pontovirgula)}//pensando
+	|{sendbackexp}retorno colche_esq [mid]:expr colche_dir {New comando.a_sendbackexp(mid.expr)}//pensando
+	|{while} enquanto parent_esq [left]:expr parent_dir [right]:comando {New comando.a_while(left.expr,right.comando)}
+	|{refbloco} bloco {-> bloco.comando}
+	|{refcall} [left}:chamada pontovirgula{-> New comando.a_callcomando(left.expr); 
+ 
+VOCE VAI FAZER:
+	 
+
+
+decfuncao {->decfuncao} = 
+ {declararfuncao} tipo_r identificador parent_esq lista_param? parent_dir bloco;
+
+
+
+ 
+ lista_param {-> parametro*}=
+ {addparam} [left]:parametro barravert [right]:listaparam {->[left.parametro,right.parametro]}
+ |{parametro1}parametro{->[parametro]} ;
+ 
+ parametro  = 
+{declararparam} tipo identificador ;
+ 
+addnome {-> addnome} = 
+	
+	{adicionarnome} [left]:virgula [iright]:identificador {-> New addnome.a_adicionarnome(left.virgula, iright.identificador)};
+	
+ 
+tipo {-> tipo} = 
+ 
+	{irpratipo} tipobase {-> New tipo.a_tipobase(tipobase)}
+ 
+	|{vectors} [tleft]:tipo_vetor [tmid]:tipobase [left]colche_esq [mid]:tipo_int [right]:colche_dir {-> New tipo.a_vectors(tleft.tipo_vetor, tmid.tipobase, left.colche_esq, mid.tipo_int, right.colche_dir)}; 
+ 
+ 
+tipobase {-> tipobase} = 
+
+     {inteiro} tipo_int {-> New tipobase.a_tipoint(tipo_int)}
+
+    {caractere} tipo_char {-> New tipobase.a_tipochar(tipo_char)}
+
+    {booleaano} tipo_bool {-> New tipobase.a_tipobool(tipo_bool)};
+	
+
+atrib {-> atrib} =  
+ 
+	{atrib} [left]:var [mid]:atribuicao [right]:expr {-> New atrib.a_atrib(left.var, right.expr)}; 
+ 
+ 
+ 
+
+expr {-> expr} =
+  
+	{termo} termo {-> termo.expr} 
+	
+	|{variable} var {-> var.expr}
+  
+	|{soma} soma [left]:expr [right]:termo {-> New expr.a_soma(left.expr, right.expr)} 
+  
+	|{subt} subt [left]:expr [right]:termo {-> New expr.a_subt(left.expr, right.expr)}
+  
+	|{igualdade} igualdade [left]:expr [right]:termo {-> New expr.a_igualdade(left.expr, right.expr)}
+  
+	|{maior_que} maior_que [left]:expr [right]:termo {-> New expr.a_maior_que(left.expr, right.expr)}
+  
+	|{maior_ou_igual} maior_ou_igual [left]:expr [right]:termo {-> New expr.a_maior_ou_igual(left.expr, right.expr)} 
+  
+	|{menor_que} menor_que [left]:expr [right]:termo {-> New expr.a_subt(left.a_menor_que,right.expr)}
+  
+	|{menor_ou_igual} menor_ou_igual [left]:expr [right]:termo {-> New expr.a_menor_ou_igual(left.expr, right.expr)};
+	
+	
+  
+
+var {-> expr} = 
+
+    {variavel}identificador {->  New expr.a_identificador(identificador)} 
+    
+	|{variavel2} [ileft]:identificador [left]:colche_esq [mid]:expr [right]:colche_dir {-> expr.expr}; 
+	
+
+termo {-> expr} =
+
+    {fator} fator {-> fator.expr}
+
+    |{mult} mult [left]:termo [right]:fator {-> New expr.a_mult(left.expr, right.expr)}
+
+    |{div} div [left]:termo [right]:fator {-> New expr.a_div(left.expr, right.expr)}
+
+    |{mod} mod [left]:termo [right]:fator {-> New expr.a_mod(left.expr, right.expr)};
+ 
+ 
+ fator {-> expr} =
+
+    {numero} numero {-> New expr.a_numero(numero)} 
+
+    |{boolean_func} booleano {->New expr.a_booleano (booleano)} 
+
+    |{caractere} caracteres {-> New expr.a_caracteres(caracteres)} 
+
+    |{string} string {-> New expr.a_string(string)};
+
+    |{fatores}[left]:parent_esq [mid]:expr [right]:parent_dir {-> expr.expr};
+	
+
+numero {-> numero} = 
+	
+	{numero} numero_inteiro {->New numero.a_numero_inteiro(numero_inteiro)};
+ 
+
+booleano{-> booleano} = 
+	
+	{true} verdade {-> New booleano.a_verdade(verdade)} 
+ 
+	|{false} falso {-> New booleano.a_falso(falso)}; 
+	
+ chamada{-> expr} =  
+ {call} identificador parent_esq [dir]:listaexp? parent_dir {-> New expr.a_chamada (identificador,[dir.expr])}
+
+ listaexp {-> expr* }= 
+ {addexpr }[esq]:expr barravert [dir]:listaexp {-> [esq.expr,dir.expr]}
+ {expr} expr{->[expr]};
+ 
+
+	
+Abstract Syntax Tree
+
+dec_variavel = 
+	{a_declararvar} [tleft]:tipo [mid]:lista_nomes [right]:pontovirgula;
+
+comando =
+	{a_condse}[left]:expr [mid]:comando [right]:comando
+	{a_sendback} [left]:retorno [right]:pontovirgula
+	|{a_sendbackexp} [rleft]:retorno [left]:colche_esq [mid]:expr [right]:colche_dir
+	|{a_while} [left]:expr  [right]:comando
+	|{a_callcomando}[left]:expr* ;
+ 
+
+tipo =
+	{a_tipobase} tipobase
+	{a_vectors} [tleft]:tipo_vetor [tmid]:tipobase [left]colche_esq [mid]:tipo_int [right]:colche_dir;
+	
+tipobase=
+{a_tipoint}tipo_int
+|{a_tipobool} tipo_bool
+|{a_tipochar} tipo_char;
+ 
+atrib = 
+	{a_atrib}  [left]:var  [right]:expr; 
+
+addexpr =
+	{a_fechobarravertexpr} [left]:barravert [right]:expr;
+ 
+expr=
+	{a_soma} [left]:expr [right]:expr
+	|{a_subt} [left]:expr [right]:expr
+	|{a_igualdade} [left]:expr [right]:expr
+	|{a_maior_que} [left]:expr [right]:expr
+	|{a_menor_que} [left]:expr [right]:expr
+	|{a_maior_ou_igual} [left]:expr [right]:expr
+	|{a_menor_ou_igual} [left]:expr [right]:expr
+	|{a_mult} [left]:expr [right]:expr
+	|{a_div} [left]:expr [right]:expr 
+	|{a_mod} [left]:expr [right]:expr
+	|{a_numero} numero
+	|{a_booleano}booleano
+	|{a_tipochar}tipo_char
+	|{a_string}string
+	|{a_identificador]}identificador
+	|{a_chamada} identificador expr*;
+ 
+ var =
+	{a_variavel2} [ileft]:identificador [left]:colche_esq [mid]:expr [right]:colche_dir;
+
+parametro=
+{parametro} tipo identificador;
+ 
+	
+numero=
+{a_numero_inteiro}numero_inteiro;
+
+
+booleaano=
+{a_verdade}verdade
+|{a_falso} falso;
+
+NAO SABEMOS FAZER:
+TIPO_R
+DECFUNCAO
+LISTANOMES
+BLOCO
+
+ATENTAR-SE A 
+
+PROGRAMA
+DECVARIAVEL
