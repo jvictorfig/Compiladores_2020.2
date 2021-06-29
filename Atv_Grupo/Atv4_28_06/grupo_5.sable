@@ -1,0 +1,330 @@
+Package prefixa;
+
+Helpers
+ binr =  '0b' | '0B'  (0|1)+;
+ comecoesqcoment = '{';
+ cr=13;
+ digito = ['0'..'9'];
+ decimal = digito+;
+ espaco = ' ';
+ hexad = '0x' | '0X'  ['0'..'9'] |['A'..'F'] | ['a'..'f']+;
+ letra = [['a'..'z'] + ['A'..'Z']];
+ newline = 10;
+ pontoevirg = 59;
+ sustenido = '#';
+ tab = 9;
+ terminadircoment = '}';
+ tudo = [0..0xffff];
+ tudosemnl = [tudo- [newline+cr]];
+ underscore ='_';
+
+Tokens
+ tipo_bool = 'boolean';
+ tipo_char = 'char';
+ tipo_int = 'integer';
+ tipo_vetor = 'vector';
+ aspas = '"';
+ nenhum = 'none';
+ barravert = '|';
+ capturar = 'capture';
+ caracteres = letra;
+ colche_dir = ']'; 
+ colche_esq = '[';
+ comeca_bloc = 'start';
+ termina_bloc = 'end';
+ se = 'if';
+ senao = 'else';
+ comentariodebloco = comecoesqcoment(tudo)*terminadircoment;
+ comentariolinha = sustenido(tudosemnl)*(newline+cr)+;
+ dir_boxcoment = '-}';
+ div = '/';
+ dois_pontos = ':';
+ e = 'and';
+ enquanto = 'while';
+ falso = 'false';
+ identificador = letra(letra|underscore)*;
+ igualdade = '=';
+ maior_ou_igual = '>=';
+ maior_que = '>';
+ menor_ou_igual = '<=';
+ menor_que = '<';
+ mod = '%';
+ mostrar ='show';
+ mult = '*';
+ negacao = 'not';
+ numero_inteiro = decimal|hexad|binr;
+ ou = 'or';
+ para_cada ='for each';
+ parent_dir = ')';
+ parent_esq = '(';
+ retorno ='send back';
+ soma = '+';
+ string = letra+;
+ subt = '-';
+ atribuicao = '<<';
+ vazio = (espaco | tab| newline|cr)+;
+ verdade = 'true';
+ virgula = ',';
+ pontovirgula = ';';
+ 
+Ignored Tokens
+ vazio, 
+ comentariolinha,
+ comentariodebloco;
+  
+Productions
+
+programa {-> programa} = 
+	
+	{programa} [esq]:listadec_variavel? [dir]:listadecfuncao? {->New programa.a_programa([esq.dec_variavel],[dir.decfuncao])};
+	
+listadec_variavel{-> dec_variavel*} =
+	
+	{listadec_variavel} dec_variavel* {->[dec_variavel]};
+ 
+
+dec_variavel{-> dec_variavel}= 
+
+	{declararvar} [esq]:tipo [mid]:lista_nomes pontovirgula{-> New dec_variavel.a_dec_variavel(esq.tipo,[mid.nomes])};
+
+
+lista_nomes{->nomes*} = 
+	
+	{listanomes}[esq]:nomes virgula  [dir]:lista_nomes{->[esq.nomes,dir.nomes]}
+ 
+	|{nomes1} nomes {->[nomes]};
+	
+
+nomes {->nomes} =
+	
+	{nomes} tipobase identificador;
+
+
+
+tipo {-> tipo} = 
+ 
+	{irpratipo} tipobase {-> New tipo.a_tipobase(tipobase)}
+ 
+	|{vectors} tipo_vetor [mid]:tipobase colche_esq tipo_int colche_dir {-> New tipo.a_vectors(mid.tipobase)}; 
+ 
+ 
+tipobase {-> tipobase} = 
+
+     {inteiro} tipo_int {-> New tipobase.a_tipoint(tipo_int)}
+
+    |{caractere} tipo_char {-> New tipobase.a_tipochar(tipo_char)}
+
+    |{booleaano} tipo_bool {-> New tipobase.a_tipobool(tipo_bool)};	
+ 
+
+listadecfuncao{-> decfuncao*} =
+	
+	{listadecfuncao}[esq]:decfuncao [dir]:listadecfuncao {->[esq.decfuncao,dir.decfuncao]}
+	
+	|{decfuncao} decfuncao {->[decfuncao]};
+	
+
+decfuncao {-> decfuncao} = 
+ 
+	{declararfuncao} [esq]:tipo_r identificador parent_esq [mid]:lista_param? parent_dir bloco {-> New decfuncao.a_declararfuncao(esq.tipo_r,[mid.parametro])};
+
+
+tipo_r{-> tipo_r} =
+	
+	{tipo_retorno} tipo {-> New tipo_r.a_tipo_retorno(tipo)}
+	
+	|{none} nenhum {->New tipo_r.a_none(nenhum)};
+
+
+lista_param {-> parametro*} =
+	
+	{addparam} [left]:parametro barravert [right]:lista_param {->[left.parametro,right.parametro]}
+	
+	|{parametro1} parametro{->[parametro]};
+ 
+
+parametro{-> parametro} = 
+	
+	{declararparam} tipo identificador;
+	
+
+bloco{->comando} = 
+	
+	{block}comeca_bloc [esq]:listadec_variavel? [dir]:listacomando? termina_bloc{-> New comando.a_bloco([esq.dec_variavel],[dir.comando])};
+
+
+atrib {-> atrib} =  
+ 
+	{atrib} [left]:var [mid]:atribuicao [right]:expr {-> New atrib.a_atrib( right.expr)}; 
+
+
+listacomando{-> comando*} =
+	
+	{listacomando} [esq]:comando [dir]:listacomando {->[esq.comando,dir.comando]}
+	
+	|{comando} comando {->[comando]};
+
+
+comando {-> comando} = 
+	
+	{atribuindo} atrib {-> New comando.a_atribuindo(atrib)} 
+	
+	|{condse} se parent_esq [left]:expr parent_dir [mid]:comando senao [dir]:comando {-> New comando.a_condse(left.expr,mid.comando,dir.comando)}
+	
+	|{para_cada} para_cada parent_esq tipo [id_um]:identificador dois_pontos [id_dois]:identificador parent_dir [dir]:comando{->New comando.a_para_cada(dir.comando)}
+	
+	|{sendback} retorno pontovirgula {->New comando.a_sendback(retorno, pontovirgula)}
+	
+	|{sendbackexp}retorno colche_esq [mid]:expr colche_dir {-> New comando.a_sendbackexp(mid.expr)}
+	
+	|{while} enquanto parent_esq [left]:expr parent_dir [right]:comando {->New comando.a_while(left.expr,right.comando)}
+	
+	|{refcall} [left]:chamada pontovirgula{-> New comando.a_callcomando(left.expr)}
+	
+	|{refbloco} bloco {->bloco.comando};
+
+
+
+chamada{-> expr} =  
+	
+	{call} identificador parent_esq [dir]:listaexp? parent_dir {-> New expr.a_chamada ([dir.expr])};
+  
+
+var {-> expr} = 
+
+    {variavel}identificador {->  New expr.a_identificador(identificador)} 
+    
+	|{variavel2} [ileft]:identificador [left]:colche_esq expr [right]:colche_dir {-> expr.expr}; 
+
+
+listaexp {-> expr* } = 
+	
+	{addexpr }[esq]:expr barravert [dir]:listaexp {-> [esq.expr,dir.expr]}
+	
+	|{expr} expr {->[expr]};
+
+
+expr {-> expr} =
+  
+	{termo} termo {-> termo.expr} 
+	
+	|{variable} var {-> var.expr}
+  
+	|{soma} soma [left]:expr [right]:termo {-> New expr.a_soma(left.expr, right.expr)} 
+  
+	|{subt} subt [left]:expr [right]:termo {-> New expr.a_subt(left.expr, right.expr)}
+  
+	|{igualdade} igualdade [left]:expr [right]:termo {-> New expr.a_igualdade(left.expr, right.expr)}
+  
+	|{maior_que} maior_que [left]:expr [right]:termo {-> New expr.a_maior_que(left.expr, right.expr)}
+  
+	|{maior_ou_igual} maior_ou_igual [left]:expr [right]:termo {-> New expr.a_maior_ou_igual(left.expr, right.expr)} 
+  
+	|{menor_que} menor_que [left]:expr [right]:termo {-> New expr.a_menor_que(left.expr,right.expr)}
+  
+	|{menor_ou_igual} menor_ou_igual [left]:expr [right]:termo {-> New expr.a_menor_ou_igual(left.expr, right.expr)};
+
+
+termo {-> expr} =
+
+    {fator} fator {-> fator.expr}
+
+    |{mult} mult [left]:termo [right]:fator {-> New expr.a_mult(left.expr, right.expr)}
+
+    |{div} div [left]:termo [right]:fator {-> New expr.a_div(left.expr, right.expr)}
+
+    |{mod} mod [left]:termo [right]:fator {-> New expr.a_mod(left.expr, right.expr)};
+ 
+ 
+fator {-> expr} =
+
+    {numero} numero {-> New expr.a_numero(numero)} 
+
+    |{boolean_func} booleano {->New expr.a_booleano (booleano)} 
+
+    |{caractere} caracteres {-> New expr.a_caracteres(caracteres)} 
+
+    |{string} string {-> New expr.a_string(string)}
+
+    |{fatores}[left]:parent_esq expr [right]:parent_dir {-> expr.expr};
+	
+
+numero {-> numero} = 
+	
+	{numero} numero_inteiro {->New numero.a_numero_inteiro(numero_inteiro)};
+ 
+
+booleano{-> booleano} = 
+	
+	{true} verdade {-> New booleano.a_verdade(verdade)} 
+ 
+	|{false} falso {-> New booleano.a_falso(falso)};
+
+Abstract Syntax Tree
+
+programa =
+	{a_programa}[esq]:dec_variavel* [dir]:decfuncao*;
+
+dec_variavel =
+	{a_dec_variavel}[esq]:tipo [mid]:nomes+;
+
+nomes =
+	{nomes} tipobase identificador;
+
+tipo =
+	{a_tipobase} tipobase
+	|{a_vectors} [mid]:tipobase;
+	
+tipobase =
+	{a_tipoint}tipo_int
+	|{a_tipobool} tipo_bool
+	|{a_tipochar} tipo_char;
+	
+decfuncao =
+	{a_declararfuncao} [esq]:tipo_r  [mid]:parametro*;
+	
+tipo_r =
+	{a_tipo_retorno} tipo
+	|{a_none} nenhum;
+	
+parametro =
+	{declararparam} tipo identificador;
+
+atrib = 
+	{a_atrib}[right]:expr; 
+ 
+comando =
+	{a_atribuindo} atrib
+	|{a_condse}[left]:expr [mid]:comando [right]:comando
+	|{a_sendback} [left]:retorno [right]:pontovirgula
+	|{a_sendbackexp}  [mid]:expr 
+	|{a_while} [left]:expr  [right]:comando
+	|{a_callcomando} expr?
+	|{a_para_cada} comando
+	|{a_bloco} [esq]:dec_variavel* [dir]:comando*;
+	
+expr =
+	{a_soma} [left]:expr [right]:expr
+	|{a_subt} [left]:expr [right]:expr
+	|{a_igualdade} [left]:expr [right]:expr
+	|{a_maior_que} [left]:expr [right]:expr
+	|{a_menor_que} [left]:expr [right]:expr
+	|{a_maior_ou_igual} [left]:expr [right]:expr
+	|{a_menor_ou_igual} [left]:expr [right]:expr
+	|{a_mult} [left]:expr [right]:expr
+	|{a_div} [left]:expr [right]:expr 
+	|{a_mod} [left]:expr [right]:expr
+	|{a_numero} numero
+	|{a_booleano}booleano
+	|{a_tipochar}tipo_char
+	|{a_string}string
+	|{a_caracteres} caracteres
+	|{a_identificador}identificador
+	|{a_chamada}  expr*;
+ 
+numero =
+	{a_numero_inteiro}numero_inteiro;
+
+booleano =
+	{a_verdade}verdade
+	|{a_falso} falso;
